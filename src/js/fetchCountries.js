@@ -1,13 +1,21 @@
-const BASE_URL = 'https://restcountries.com/v2';
+export function fetchCountries(name) {
+  const url = `https://restcountries.com/v3/name/${encodeURIComponent(name)}?fields=name.official,capital,population,flags.svg,languages`;
 
-export async function fetchCountries(searchQuery) {
-  const response = await fetch(`${BASE_URL}/name/${searchQuery}`);
-  if (!response.ok) {
-    throw new Error(response.status);
-  }
-  const countries = await response.json();
-  if (countries.length > 10) {
-    return [];
-  }
-  return countries;
+  return fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Не вдалося отримати дані про країни');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (Array.isArray(data)) {
+        return data;
+      } else if (data instanceof Object) {
+        // Преобразуємо об'єкт у масив об'єктів
+        return [data];
+      } else {
+        return [];
+      }
+    });
 }
